@@ -11,5 +11,9 @@ This script forge http requests to send sms through fullonsms.com. Since it uses
 ###Usage###
 Just run <code>python fullonsms.py</code> from the console and follow the instructions. *You need to sign up at fullonsms.com*
 
+###Dependencies###
+*	Python [Requests](https://github.com/kennethreitz/requests) library (<code>pip install requests</code>)  
+
+
 ###Status###
 Was working till the push date.
