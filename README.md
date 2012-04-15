@@ -5,11 +5,11 @@ These are actually example code snippets I am making while learning new things. 
 Here is the list of all the scripts included in this repo with descriptions:
 
 ##fullonsms.py##
-*You need to sign up at fullonsms.com* to use this.  
+**You need to sign up at fullonsms.com to use this.**  
 This script forge http requests to send sms through fullonsms.com. Since it usess fullonsms.com which is available only in India, this might be of no use for others.
 
 ###Usage###
-Just run <code>python fullonsms.py</code> and follow the instructions. *You need to sign up at fullonsms.com*
+Just run <code>python fullonsms.py</code> from the console and follow the instructions. *You need to sign up at fullonsms.com*
 
 ###Status###
 Was working till the push date.
