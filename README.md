@@ -18,8 +18,8 @@ Just run <code>python fullonsms.py</code> from the console and follow the instru
 Was working till the push date.
 
 ##notDoppler.py##
-Illustrate use of BeautifulSoup
-A crawler to extract all the game links (swf files) from notdoppler.com by crawling through all through all the pages. 
+Illustrating use of BeautifulSoup.  
+A crawler to extract all game links (swf files) from notdoppler.com by crawling through all pages. 
 **Only work with notdoppler.com**
 
 ###Usage###
@@ -33,4 +33,5 @@ A crawler to extract all the game links (swf files) from notdoppler.com by crawl
 *	Python [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup) library (<code>pip install bs4</code>)    
 
 ###Status###
-Was working till push date
+Was working till push date.  
+Fails when touches protected pages. This can be avoided but I didn't do it. 'Cause the purpose is demonstration of BeautifulSoup (moreover, it fails after getting through about 2000 pages, extracting about 1600 swf links, which is enough for task at hand).
