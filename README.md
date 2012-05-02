@@ -14,6 +14,23 @@ Just run <code>python fullonsms.py</code> from the console and follow the instru
 ###Dependencies###
 *	Python [Requests](https://github.com/kennethreitz/requests) library (<code>pip install requests</code>)  
 
-
 ###Status###
 Was working till the push date.
+
+##notDoppler.py##
+Illustrate use of BeautifulSoup
+A crawler to extract all the game links (swf files) from notdoppler.com by crawling through all through all the pages. 
+**Only work with notdoppler.com**
+
+###Usage###
+*	Change GAME_LINKS and CRAWL_LINKS variables to the destination where you want to save the files. (Will overwrite if file already present)
+	*	GAME_LINKS = Address of file to save game links (swf files) (e.g. "/home/user/filename")
+	*	CRAWL_LINKS = Address of file to save links which script is going to crawl (e.g. "/home/user/filename")
+*	Run <code>python ./notDoppler.py</code> from terminal and grab some popcorn :-)
+
+###Dependencies###
+*	Python [Requests](https://github.com/kennethreitz/requests) library (<code>pip install requests</code>)  
+*	Python [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup) library (<code>pip install bs4</code>)    
+
+###Status###
+Was working till push date
