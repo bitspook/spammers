@@ -18,7 +18,7 @@ Just run <code>python fullonsms.py</code> from the console and follow the instru
 Was working till the push date.
 
 ##notDoppler.py##
-Illustrating use of BeautifulSoup.  
+Illustrating BeautifulSoup.  
 A crawler to extract all game links (swf files) from notdoppler.com by crawling through all pages. 
 **Only work with notdoppler.com**
 
