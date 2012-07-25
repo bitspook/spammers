@@ -1,100 +1,95 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import MySQLdb
 
-soup = BeautifulSoup(requests.get("http://www.notdoppler.com/action.php").content)
+# soup = BeautifulSoup(requests.get("http://www.notdoppler.com/action.php").content)
 
-def get_links_to_crawl(soup):
-	'''Get the links to crawl from the current page. Returns list of non duplicate links'''
-	links = []
-	for anchor in soup.find_all('a'):		#get all links
-			address = anchor.get('href')		#get href attribute of links
-			
-			#some links don't have hrefs, in that case empty object of Nonetype is returned
-			if type(address) != type(None):	
-				#filter empty link, duplicate link and pass link with php extension
-				if len(address) > 3 and address not in addresses and 'php' in address:
-					addresses.append(address)
-					#make link iterable by adding needed info (based on the structure
-						#of different links on notdoppler.com)
-					if 'http://' in address and "http://www.notdoppler.com" not in address:
-						continue
-					elif "http://www.notdoppler.com/" in address:
-						links.append(address)				
-					elif address[0] == '/':
-						links.append("http://www.notdoppler.com"+address)
-					else:
-						links.append("http://www.notdoppler.com/"+address)
-
-	return links	
-
-
-def get_game_link(soup): #page_link):
+def get_game_link(page_link):
 	'''Returns the game link if one present in the page, or return empty object 
 			of Nonetype otherwise'''
+	soup = BeautifulSoup(requests.get(page_link).content)
 	try:
 		game_link = soup.find_all('embed',src=re.compile('swf'))[0].get('src')
 		return game_link
 	except:
 		pass
 
-def get_game_image(soup):
-	'''Returns the image link for the game to be shown in embed body on html'''
+def get_game_details(soup):
+	'''Returns a dict containing game_name and game_type
+		detail_dict['game_name'] = [game_type, thumb, game_page, game_link]'''
 
-class notDoppler():
- 	"""notDoppler class"""
+	name_list = []
+	game_pages = []
+	#loop to get lists of game_names and game_types, and game_pages
+	for span in soup.find_all('span'):		
+		if span.has_key('class') and span['class']==['gamephp1']: #tag['class'] returns a list
+			if(span.a['href'][0]=='/'):
+				game_pages.append(span.a['href'])
 
- 	def __init__(self, soup):
- 		self.soup = soup
+			for string in span.a.stripped_strings:
+				name_list.append(string)
 
-	def get_game_name(soup):
-		'''Function returns a dict containing game_name and game_type'''
+	thumbs = []
+	#loop to get thumbnails
+	for span in soup.find_all('span'):
+	    if span.has_key('class') and span['class']==['gamephp1']:
+	    	if(span.parent.parent.parent.previous_sibling and type(span.parent.parent.parent.previous_sibling)==type(soup.a)):
+	    		thumbs.append(span.parent.parent.parent.previous_sibling.img['src'])
 
-		span_list = []
-		for span in soup.find_all('span'):		#loop to get list of all spans of class 'gamephp1'
-			if span.has_key('class') and span['class']==['gamephp1']: #tag['class'] returns a list
-				span_list.append(span)
+	detail_dict = {}
+	detail_list = []
+	name_cur = 1 	
+	game_cur = 0
+	thumb_cur = 0
+	#loop tp populate dict with game_name, game_type and thumbnail uri
+	while(name_cur<len(name_list) and thumb_cur<len(thumbs)):	
+	    detail_dict[name_list[name_cur]]=[name_list[name_cur+1],thumbs[thumb_cur], game_pages[game_cur]]
+	    name_cur += 2
+	    game_cur += 2
+	    thumb_cur += 1
 
-		detail_dict = {}
-		cur = 1 	#curson to go through loop
-		while(cur<len(span_list)):		#loop tp populate dict with game_name and game_type
-		    detail_dict[span_list[cur]]=span_list[cur+1]
-    		cur += 2
+	base_url = "http://www.notdoppler.com"
+	game_links = []
 
-        return detail_dict
+	# game_link = get_game_link(base_url+detail_dict['PLAZMA BURST 2'][2])
+	# game_links.append(game_link)
 
-	def get_thumbs(soup,thumbs, game_pages):
-		'''Returns dictionary of game data.'''
-		for i in soup.find_all('td'):
-			if i.has_key('width') and i['width']=='175':
-				if type(i.img) != type(None):
-					thumbs.add(i.img['src'])
-					if i.img.parent.has_key('href'):
-                		game_pages.add(i.img.parent['href'])
-        for game_name,game_page, thumb in game_pages, thumbs:
-        	game_data['name']['thumb'] = thumb
-        	game_data['name']['game_page'] = game_page
+	for game in detail_dict:
+		game_link = get_game_link(base_url+detail_dict[game][2])
+		#if no game (swf file) is found on page, function returns
+			#empty object of Nonetype. 
+		if (type(game_link) != type(None)):
+			game_links.append("Game not found")
+		else:
+			game_links.append(game_link)
 
-
-		return thumbs
-	game_data = dict()
-	thumbs = set()
-	game_pages = set()
-	return get_thumbs(soup,thumbs)
+	#loop to enter game link of the game
+	for game,link in map(None, detail_dict, game_links):
+		detail_dict[game].append(link)
+		
+	return detail_dict
 
 
-# from index page
-thumbnails = get_thumbs_set(soup)
-game_page = ''
-genere = ''
-game_name = ''
-game_description = ''
+def main():
+	db_user = 'root'
+	db_pass = 'root'
+	db_name = 'online_games'
+	db = MySQLdb.connect('localhost', db_user, db_pass, db_name)
 
-# from game page
-game_link = ''
-created_by = ''
+	cursor = db.cursor()
+
+	query = """select * from notDoppler"""
+	try:
+		cursor.execute(query)
+		result = cursor.fetchall()
+		print result
+	except Exception, e:
+		print e
+		print "Shit happens"
+	finally:
+		db.close()
 
 
 if __name__ == '__main__':
-	for i in get_thumbs_set(soup):
-		print i
+	print main()
