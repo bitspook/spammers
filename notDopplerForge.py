@@ -3,12 +3,14 @@ from bs4 import BeautifulSoup
 import re
 import MySQLdb
 
-# soup = BeautifulSoup(requests.get("http://www.notdoppler.com/action.php").content)
+soup = BeautifulSoup(requests.get("http://www.notdoppler.com/action.php").content)
+print "Soup is ready"
 
 def get_game_link(page_link):
 	'''Returns the game link if one present in the page, or return empty object 
 			of Nonetype otherwise'''
 	soup = BeautifulSoup(requests.get(page_link).content)
+	print " game link"
 	try:
 		game_link = soup.find_all('embed',src=re.compile('swf'))[0].get('src')
 		return game_link
@@ -68,6 +70,7 @@ def get_game_details(soup):
 	for game,link in map(None, detail_dict, game_links):
 		detail_dict[game].append(link)
 		
+	print "Game details in my hand"
 	return detail_dict
 
 
@@ -79,17 +82,26 @@ def main():
 
 	cursor = db.cursor()
 
-	query = """select * from notDoppler"""
-	try:
-		cursor.execute(query)
-		result = cursor.fetchall()
-		print result
-	except Exception, e:
-		print e
-		print "Shit happens"
-	finally:
-		db.close()
+
+	game_details = {'Hell':['type','thumb','page','thumb']}
+
+	for g_name in game_details:
+		game_name = g_name
+		game_type = game_details[g_name][0]
+		game_thumb = game_details[g_name][1]
+		game_link = game_details[g_name][2]
+
+		query = """INSERT INTO notDoppler (game_name, game_type, game_thumb, game_link)
+				VALUES ('%s', '%s', '%s', '%s')"""	% (game_name, game_type, game_thumb, game_link)
+		try:
+			cursor.execute(query)
+			db.commit()
+		except Exception, e:
+			print e
+			print "Shit happens"
+		# finally:
+			# db.close()
 
 
 if __name__ == '__main__':
-	print main()
+	main()
