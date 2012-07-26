@@ -83,7 +83,7 @@ def main():
 	cursor = db.cursor()
 
 
-	game_details = {'Hell':['type','thumb','page','thumb']}
+	game_details = get_game_details(soup)
 
 	for g_name in game_details:
 		game_name = g_name
