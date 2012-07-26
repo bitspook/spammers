@@ -89,7 +89,7 @@ def main():
 		game_name = g_name
 		game_type = game_details[g_name][0]
 		game_thumb = game_details[g_name][1]
-		game_link = game_details[g_name][2]
+		game_link = game_details[g_name][3]
 
 		query = """INSERT INTO notDoppler (game_name, game_type, game_thumb, game_link)
 				VALUES ('%s', '%s', '%s', '%s')"""	% (game_name, game_type, game_thumb, game_link)
