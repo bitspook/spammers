@@ -3,14 +3,12 @@ from bs4 import BeautifulSoup
 import re
 import MySQLdb
 
-soup = BeautifulSoup(requests.get("http://www.notdoppler.com/action.php").content)
-print "Soup is ready"
 
 def get_game_link(page_link):
 	'''Returns the game link if one present in the page, or return empty object 
 			of Nonetype otherwise'''
 	soup = BeautifulSoup(requests.get(page_link).content)
-	print " game link"
+	print "Getting game link from {0}".format(page_link)
 	try:
 		game_link = soup.find_all('embed',src=re.compile('swf'))[0].get('src')
 		return game_link
@@ -54,17 +52,15 @@ def get_game_details(soup):
 	base_url = "http://www.notdoppler.com"
 	game_links = []
 
-	# game_link = get_game_link(base_url+detail_dict['PLAZMA BURST 2'][2])
-	# game_links.append(game_link)
-
+	#loop to find game links and put them in detail_dict
 	for game in detail_dict:
 		game_link = get_game_link(base_url+detail_dict[game][2])
 		#if no game (swf file) is found on page, function returns
 			#empty object of Nonetype. 
 		if (type(game_link) != type(None)):
-			game_links.append("Game not found")
-		else:
 			game_links.append(game_link)
+		else:
+			game_links.append("Game not found")
 
 	#loop to enter game link of the game
 	for game,link in map(None, detail_dict, game_links):
@@ -78,30 +74,35 @@ def main():
 	db_user = 'root'
 	db_pass = 'root'
 	db_name = 'online_games'
-	db = MySQLdb.connect('localhost', db_user, db_pass, db_name)
 
-	cursor = db.cursor()
+	pages_to_crawl = [
+	
+	]
+	
+	for page_to_crawl in pages_to_crawl:
+		soup = BeautifulSoup(requests.get( page_to_crawl ).content)
+		print "Soup for {0} is ready".format(page_to_crawl)
 
+		game_details = get_game_details(soup)
 
-	game_details = get_game_details(soup)
+		with MySQLdb.connect('localhost', db_user, db_pass, db_name) as db:
+			print "Connecting to Database"
+			# cursor = db.cursor()
 
-	for g_name in game_details:
-		game_name = g_name
-		game_type = game_details[g_name][0]
-		game_thumb = game_details[g_name][1]
-		game_link = game_details[g_name][3]
+			for g_name in game_details:
+				game_name = g_name
+				game_type = game_details[g_name][0]
+				game_thumb = game_details[g_name][1]
+				game_link = game_details[g_name][3]
 
-		query = """INSERT INTO notDoppler (game_name, game_type, game_thumb, game_link)
-				VALUES ('%s', '%s', '%s', '%s')"""	% (game_name, game_type, game_thumb, game_link)
-		try:
-			cursor.execute(query)
-			db.commit()
-		except Exception, e:
-			print e
-			print "Shit happens"
-		# finally:
-			# db.close()
-
+				query = """INSERT INTO notDoppler (game_name, game_type, game_thumb, game_link)
+						VALUES ('%s', '%s', '%s', '%s')"""	% (game_name, game_type, game_thumb, game_link)
+				try:
+					db.execute(query)
+					print "Game {0} of type {1} added to Database".format(game_name, game_type)
+				except Exception, e:
+					print e
+					print "Shit happens"
 
 if __name__ == '__main__':
 	main()
