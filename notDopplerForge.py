@@ -97,6 +97,7 @@ def main():
 
 				query = """INSERT INTO notDoppler (game_name, game_type, game_thumb, game_link)
 						VALUES ('%s', '%s', '%s', '%s')"""	% (game_name, game_type, game_thumb, game_link)
+
 				try:
 					db.execute(query)
 					print "Game {0} of type {1} added to Database".format(game_name, game_type)
